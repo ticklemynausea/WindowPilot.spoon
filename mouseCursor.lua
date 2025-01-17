@@ -1,26 +1,28 @@
 local function mouseCursor(wp)
   local function getWindowUnderMouse()
-      local mousePos = hs.mouse.absolutePosition()
-      local windows = hs.window.visibleWindows()
+    local mousePos = hs.mouse.absolutePosition()
+    local windows = hs.window.visibleWindows()
 
-      for _, window in ipairs(windows) do
-          local frame = window:frame()
+    for _, window in ipairs(windows) do
+      local frame = window:frame()
 
-          if (mousePos.x >= frame.x) and
-             (mousePos.x <= frame.x + frame.w) and
-             (mousePos.y >= frame.y) and
-             (mousePos.y <= frame.y + frame.h) then
-              return window
-          end
+      if
+        (mousePos.x >= frame.x)
+        and (mousePos.x <= frame.x + frame.w)
+        and (mousePos.y >= frame.y)
+        and (mousePos.y <= frame.y + frame.h)
+      then
+        return window
       end
-      return nil
+    end
+    return nil
   end
 
   local function focusMouseWindow()
     local windowUnderMouse = getWindowUnderMouse()
 
     if windowUnderMouse then
-        windowUnderMouse:focus()
+      windowUnderMouse:focus()
     end
   end
 

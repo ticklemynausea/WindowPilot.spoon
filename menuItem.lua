@@ -8,26 +8,41 @@ local function menuItem(wp)
       menubar:setIcon(image)
 
       menubar:setMenu({
-        {title = "Binary Space Partitioning", fn = function()
-          wp.commands.windowLayout.layoutTiledBSP()
-          updateMenu()
-        end},
-        {title = "Main and Stack", fn = function()
-          wp.commands.windowLayout.layoutMainAndStack()
-          updateMenu()
-        end},
-        {title = "Full Screen", fn = function()
-          wp.commands.windowLayout.layoutFullScreen()
-          updateMenu()
-        end},
-        {title = "Cascading", fn = function()
-          wp.commands.windowLayout.layoutCascading()
-          updateMenu()
-        end},
-        {title = "Main and Stack", fn = function()
-          wp.commands.windowLayout.layoutMainAndStack()
-          updateMenu()
-        end},
+        {
+          title = "Binary Space Partitioning",
+          fn = function()
+            wp.commands.windowLayout.layoutTiledBSP()
+            updateMenu()
+          end,
+        },
+        {
+          title = "Main and Stack",
+          fn = function()
+            wp.commands.windowLayout.layoutMainAndStack()
+            updateMenu()
+          end,
+        },
+        {
+          title = "Full Screen",
+          fn = function()
+            wp.commands.windowLayout.layoutFullScreen()
+            updateMenu()
+          end,
+        },
+        {
+          title = "Cascading",
+          fn = function()
+            wp.commands.windowLayout.layoutCascading()
+            updateMenu()
+          end,
+        },
+        {
+          title = "Main and Stack",
+          fn = function()
+            wp.commands.windowLayout.layoutMainAndStack()
+            updateMenu()
+          end,
+        },
       })
     end
   end
