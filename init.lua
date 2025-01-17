@@ -7,17 +7,28 @@ wp.author = "Mário Carneiro"
 wp.license = "MIT - https://opensource.org/licenses/MIT"
 wp.homepage = "https://github.com/ticklemynausea/WindowPilot.spoon"
 
-function wp:initialize()
+function wp:initialize(configuration)
     local resourcePath = hs.spoons.resourcePath("")
     package.path = resourcePath .. "/?.lua;" .. package.path
 
     wp.hotkeys = {}
-    wp.layouts = {}
+
+    wp.configuration = {
+      windowMargin = 6
+    }
+
+    for key, value in pairs(configuration) do
+        wp.configuration[key] = value
+    end
+
+    print("[WindowPilot] Configured")
+
     wp.commands = {
       switchWindow = require('switchWindow')(wp),
       mouseCursor = require('mouseCursor')(wp),
+      windowLayout = require('windowLayout')(wp),
+      windowMovement = require('windowMovement')(wp),
     }
-
 
     print("[WindowPilot] Initialized")
 end

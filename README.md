@@ -6,7 +6,9 @@ TODO
 ```lua
 local wp = hs.loadSpoon("WindowPilot")
 
-wp:initialize()
+wp:initialize({
+  windowMargin = 6
+})
 
 wp:bindKeys({
   switchWindow = {
@@ -17,6 +19,12 @@ wp:bindKeys({
     moveToNextScreen = { { "ctrl", "shift"}, "left" },
     moveToPreviousScreen = { { "ctrl", "shift" }, "right" },
   },
+  windowLayout = {
+    layoutTiledBSP = { { "alt", "cmd" }, "T" },
+    layoutFullScreen = { { "alt", "cmd" }, "F" },
+    layoutCascading = { { "alt", "cmd" }, "C" },
+    layoutMainAndStack = { { "alt", "cmd" }, "S" },
+  }
 })
 ```
 
