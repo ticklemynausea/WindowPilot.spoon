@@ -5,12 +5,18 @@ TODO
 
 ```lua
 local wp = hs.loadSpoon("WindowPilot")
+
 wp:initialize()
+
 wp:bindKeys({
   switchWindow = {
     forward = { { "alt" }, "tab" },
     backward = { { "alt", "shift" }, "tab" },
-  }
+  },
+  mouseCursor = {
+    moveToNextScreen = { { "ctrl", "shift"}, "left" },
+    moveToPreviousScreen = { { "ctrl", "shift" }, "right" },
+  },
 })
 ```
 

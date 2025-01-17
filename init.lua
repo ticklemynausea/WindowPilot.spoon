@@ -15,6 +15,7 @@ function wp:initialize()
     wp.layouts = {}
     wp.commands = {
       switchWindow = require('switchWindow')(wp),
+      mouseCursor = require('mouseCursor')(wp),
     }
 
 
