@@ -30,6 +30,8 @@ function wp:initialize(configuration)
       windowMovement = require('windowMovement')(wp),
     }
 
+    require('menuItem')(wp)
+
     print("[WindowPilot] Initialized")
 end
 
