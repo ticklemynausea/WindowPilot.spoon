@@ -2,6 +2,18 @@
 
 TODO
 
+
+```lua
+local wp = hs.loadSpoon("WindowPilot")
+wp:initialize()
+wp:bindKeys({
+  switchWindow = {
+    forward = { { "alt" }, "tab" },
+    backward = { { "alt", "shift" }, "tab" },
+  }
+})
+```
+
 ## Contributing
 
 Contributions are welcome! Feel free to submit issues or pull requests on [GitHub](https://github.com/ticklemynausea/WindowPilot.spoon).
