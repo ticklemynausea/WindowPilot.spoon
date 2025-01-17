@@ -24,6 +24,16 @@ wp:bindKeys({
     layoutFullScreen = { { "alt", "cmd" }, "F" },
     layoutCascading = { { "alt", "cmd" }, "C" },
     layoutMainAndStack = { { "alt", "cmd" }, "S" },
+  },
+  windowMovement = {
+    moveWindowLeft = { {"alt", "cmd"}, "left" },
+    moveWindowRight = { {"alt", "cmd"}, "right" },
+    moveWindowTop = { {"alt", "cmd"}, "up" },
+    moveWindowBottom = { {"alt", "cmd"}, "down" },
+    moveWindowToNextScreen = { { "cmd", "alt" }, "]" },
+    moveWindowToPreviousScreen = { { "cmd", "alt" }, "["},
+    moveWindowToNextSpace = { {"shift", "alt", "cmd"}, "]" },
+    moveWindowToPreviousSpace = { {"shift", "alt", "cmd"}, "[" },
   }
 })
 ```
