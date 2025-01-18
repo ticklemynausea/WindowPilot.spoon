@@ -36,13 +36,6 @@ local function menuItem(wp)
             updateMenu()
           end,
         },
-        {
-          title = "Main and Stack",
-          fn = function()
-            wp.commands.windowLayout.layoutMainAndStack()
-            updateMenu()
-          end,
-        },
       })
     end
   end
