@@ -205,11 +205,75 @@ local function windowLayout(wp)
     end
   end
 
+  local function layoutThrees()
+    local screen = hs.screen.mainScreen()
+    local screenFrame = screen:frame()
+    local orientation = getScreenOrientation()
+    local windows = getVisibleWindowsInCurrentSpace()
+
+    if #windows == 0 then
+      hs.alert.show("No windows to arrange.")
+      return
+    end
+
+    local mainWindow = hs.window.focusedWindow()
+    if not mainWindow or not hs.fnutils.contains(windows, mainWindow) then
+      mainWindow = windows[1]
+    end
+
+    -- Ensure mainWindow is the first in the list
+    local orderedWindows = {mainWindow}
+    for _, win in ipairs(windows) do
+      if win ~= mainWindow then
+        table.insert(orderedWindows, win)
+      end
+    end
+
+    local isLandscape = orientation == "landscape"
+    local sectionSize = {
+      w = isLandscape and ((screenFrame.w - margin * 4) / 3) or (screenFrame.w - margin * 2),
+      h = isLandscape and (screenFrame.h - margin * 2) or ((screenFrame.h - margin * 4) / 3),
+    }
+
+    local positions = {
+      {
+        x = screenFrame.x + margin,
+        y = screenFrame.y + margin,
+      },
+      {
+        x = isLandscape and (screenFrame.x + sectionSize.w + margin * 2) or screenFrame.x + margin,
+        y = isLandscape and screenFrame.y + margin or (screenFrame.y + sectionSize.h + margin * 2),
+      },
+      {
+        x = isLandscape and (screenFrame.x + sectionSize.w * 2 + margin * 3) or screenFrame.x + margin,
+        y = isLandscape and screenFrame.y + margin or (screenFrame.y + sectionSize.h * 2 + margin * 3),
+      }
+    }
+
+    -- Place first two windows in their respective positions
+    for i = 1, math.min(2, #orderedWindows) do
+      orderedWindows[i]:setFrame(hs.geometry.rect(positions[i].x, positions[i].y, sectionSize.w, sectionSize.h), 0)
+    end
+
+    -- Stack remaining windows in the third section
+    local stackedWindows = {}
+    for i = 3, #orderedWindows do
+      table.insert(stackedWindows, orderedWindows[i])
+    end
+
+    if #stackedWindows > 0 then
+      for _, win in ipairs(stackedWindows) do
+        win:setFrame(hs.geometry.rect(positions[3].x, positions[3].y, sectionSize.w, sectionSize.h), 0)
+      end
+    end
+  end
+
   return {
     layoutTiledBSP = layoutTiledBSP,
     layoutFullScreen = layoutFullScreen,
     layoutCascading = layoutCascading,
     layoutMainAndStack = layoutMainAndStack,
+    layoutThrees = layoutThrees,
   }
 end
 

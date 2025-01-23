@@ -23,6 +23,13 @@ local function menuItem(wp)
           end,
         },
         {
+          title = "Threes",
+          fn = function()
+            wp.commands.windowLayout.layoutThrees()
+            updateMenu()
+          end,
+        },
+        {
           title = "Full Screen",
           fn = function()
             wp.commands.windowLayout.layoutFullScreen()
