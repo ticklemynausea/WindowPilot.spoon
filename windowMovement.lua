@@ -1,6 +1,7 @@
 local function windowMovement(wp)
   local margin = wp.configuration.windowMargin
   local moveWindowSizes = { 0.5, 0.3335, 0.669 }
+  local centerWindowSizes = { 0.6, 0.75, 0.9 }
 
   local function nextWindowPosition(current, presets)
     local closest = presets[1]
@@ -139,6 +140,25 @@ local function windowMovement(wp)
     end)
   end
 
+  local function moveWindowCenter()
+    local win = hs.window.focusedWindow()
+    if not win then return end
+
+    local screen = win:screen():frame()
+    local winFrame = win:frame()
+
+    local currentSize = winFrame.w / screen.w
+    local nextSize = nextWindowPosition(currentSize, centerWindowSizes)
+
+    local newWidth = screen.w * nextSize
+    local newHeight = screen.h * nextSize
+
+    local newX = screen.x + (screen.w - newWidth) / 2
+    local newY = screen.y + (screen.h - newHeight) / 2
+
+    win:setFrame({ x = newX, y = newY, w = newWidth, h = newHeight }, 0)
+  end
+
   return {
     moveWindowLeft = function()
       moveWindow("left")
@@ -151,6 +171,9 @@ local function windowMovement(wp)
     end,
     moveWindowBottom = function()
       moveWindow("bottom")
+    end,
+    moveWindowCenter = function()
+      moveWindowCenter()
     end,
     moveWindowToNextScreen = function()
       moveWindowToScreen("next")
