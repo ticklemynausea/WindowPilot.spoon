@@ -23,6 +23,13 @@ local function menuItem(wp)
           end,
         },
         {
+          title = "Halves",
+          fn = function()
+            wp.commands.windowLayout.layoutHalves()
+            updateMenu()
+          end,
+        },
+        {
           title = "Threes",
           fn = function()
             wp.commands.windowLayout.layoutThrees()
