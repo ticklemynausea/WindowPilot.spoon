@@ -62,4 +62,22 @@ function wp:bindKeys(mapping, prefix)
   end
 end
 
+function wp:bindShortcuts(bindings)
+  for _, binding in ipairs(bindings) do
+    local mods, key = table.unpack(binding.keys)
+    local name = binding.name
+    local actionPath = "focusWindow:" .. name
+
+    if wp.hotkeys[actionPath] then
+      wp.hotkeys[actionPath]:delete()
+    end
+
+    wp.hotkeys[actionPath] = hs.hotkey.bind(mods, key, function()
+      wp.commands.switchWindow.toApp(name)
+    end)
+
+    print("[WindowPilot] Bound window shortcut for " .. name)
+  end
+end
+
 return wp

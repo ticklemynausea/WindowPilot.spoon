@@ -49,9 +49,26 @@ local function switchWindow(wp)
     prevWindow:focus()
   end
 
+  local function switchToApp(name)
+    print("Switching to: " .. name)
+
+    local app = hs.application.get(name)
+    if app then
+      local win = app:mainWindow()
+      if win and win:isStandard() and not win:isMinimized() then
+        print("Fallback: focusing main window of app " .. name)
+        win:focus()
+        return
+      end
+    end
+
+    hs.alert("Window or app not found: " .. name)
+  end
+
   return {
     forward = switchWindowForward,
     backward = switchWindowBackward,
+    toApp = switchToApp,
   }
 end
 
