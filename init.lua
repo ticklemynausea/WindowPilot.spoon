@@ -28,9 +28,11 @@ function wp:initialize(configuration)
     mouseCursor = require("mouseCursor")(wp),
     windowLayout = require("windowLayout")(wp),
     windowMovement = require("windowMovement")(wp),
+    wpHelp = require("help")(wp),
   }
 
   require("menuItem")(wp)
+
 
   print("[WindowPilot] Initialized")
 end
@@ -49,9 +51,12 @@ function wp:bindKeys(mapping, prefix)
         if wp.hotkeys[actionPath] then
           wp.hotkeys[actionPath]:delete()
         end
-        wp.hotkeys[actionPath] = hs.hotkey.bind(value[1], value[2], function()
-          command(wp)
-        end)
+        wp.hotkeys[actionPath] = {
+          keys = value,
+          action = hs.hotkey.bind(value[1], value[2], function()
+            command(wp)
+          end),
+        }
         print("[WindowPilot] Bound key for " .. actionPath)
       else
         print("[WindowPilot] Error: Command not found for " .. actionPath)
@@ -72,9 +77,12 @@ function wp:bindShortcuts(bindings)
       wp.hotkeys[actionPath]:delete()
     end
 
-    wp.hotkeys[actionPath] = hs.hotkey.bind(mods, key, function()
-      wp.commands.switchWindow.toApp(name)
-    end)
+    wp.hotkeys[actionPath] = {
+      keys = { mods, key },
+      action = hs.hotkey.bind(mods, key, function()
+        wp.commands.switchWindow.toApp(name)
+      end),
+    }
 
     print("[WindowPilot] Bound window shortcut for " .. name)
   end
