@@ -33,7 +33,6 @@ function wp:initialize(configuration)
 
   require("menuItem")(wp)
 
-
   print("[WindowPilot] Initialized")
 end
 

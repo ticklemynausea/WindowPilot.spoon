@@ -222,7 +222,7 @@ local function windowLayout(wp)
     end
 
     -- Ensure mainWindow is the first in the list
-    local orderedWindows = {mainWindow}
+    local orderedWindows = { mainWindow }
     for _, win in ipairs(windows) do
       if win ~= mainWindow then
         table.insert(orderedWindows, win)
@@ -243,7 +243,7 @@ local function windowLayout(wp)
       {
         x = isLandscape and (screenFrame.x + sectionSize.w + margin * 2) or screenFrame.x + margin,
         y = isLandscape and screenFrame.y + margin or (screenFrame.y + sectionSize.h + margin * 2),
-      }
+      },
     }
 
     -- Place first two windows in their respective positions
@@ -281,7 +281,7 @@ local function windowLayout(wp)
     end
 
     -- Ensure mainWindow is the first in the list
-    local orderedWindows = {mainWindow}
+    local orderedWindows = { mainWindow }
     for _, win in ipairs(windows) do
       if win ~= mainWindow then
         table.insert(orderedWindows, win)
@@ -306,7 +306,7 @@ local function windowLayout(wp)
       {
         x = isLandscape and (screenFrame.x + sectionSize.w * 2 + margin * 3) or screenFrame.x + margin,
         y = isLandscape and screenFrame.y + margin or (screenFrame.y + sectionSize.h * 2 + margin * 3),
-      }
+      },
     }
 
     -- Place first two windows in their respective positions

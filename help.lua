@@ -11,7 +11,9 @@ local function wpHelp(wp)
       end
     end
 
-    table.sort(rows, function(a, b) return a.action < b.action end)
+    table.sort(rows, function(a, b)
+      return a.action < b.action
+    end)
 
     -- Find max combo width
     local maxComboLen = 0
@@ -28,15 +30,18 @@ local function wpHelp(wp)
       table.insert(lines, string.format("  %s   %s", paddedCombo, row.action))
     end
 
-    hs.alert.show(hs.styledtext.new(table.concat(lines, "\n"), {
-      font = { name = "Menlo", size = 14 },
-      color = { white = 1 },
-      paragraphStyle = { lineSpacing = 4 },
-    }), 8)
+    hs.alert.show(
+      hs.styledtext.new(table.concat(lines, "\n"), {
+        font = { name = "Menlo", size = 14 },
+        color = { white = 1 },
+        paragraphStyle = { lineSpacing = 4 },
+      }),
+      8
+    )
   end
 
   return {
-    keyList = keyList
+    keyList = keyList,
   }
 end
 

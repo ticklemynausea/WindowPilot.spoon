@@ -142,7 +142,9 @@ local function windowMovement(wp)
 
   local function moveWindowCenter()
     local win = hs.window.focusedWindow()
-    if not win then return end
+    if not win then
+      return
+    end
 
     local screen = win:screen():frame()
     local winFrame = win:frame()
