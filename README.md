@@ -1,102 +1,117 @@
-# **WindowPilot** 🛩️
-_Window management utilities for macOS using Hammerspoon._
+# WindowPilot
 
-WindowPilot is a **keyboard-driven** window manager for macOS, designed to provide powerful yet intuitive window management capabilities. It brings **window switching, layout management, movement controls, and cursor positioning** under a unified, easy-to-configure system. Inspired by Rectangle.
+Window management utilities for macOS using Hammerspoon.
 
----
+## Installation
 
-## **Installation** ⚙️
+1. Install Hammerspoon: [https://www.hammerspoon.org/](https://www.hammerspoon.org/)
+2. Clone and move the Spoon:
+   ```sh
+   git clone https://github.com/ticklemynausea/WindowPilot.spoon.git
+   mv WindowPilot.spoon ~/.hammerspoon/Spoons/
+   ```
+3. Add to `~/.hammerspoon/init.lua`:
+   ```lua
+   local wp = hs.loadSpoon("WindowPilot")
 
-### **1. Install Hammerspoon**
-If you haven’t installed Hammerspoon yet, [download it here](https://www.hammerspoon.org/) and place it in your Applications folder.
+   wp:initialize({ windowMargin = 6 })
 
-### **2. Install WindowPilot Spoon**
-Clone the repository and move the Spoon to your Hammerspoon Spoons directory:
+   wp:bindKeys({
+     switchWindow = {
+       forward = { { "alt" }, "tab" },
+       backward = { { "alt", "shift" }, "tab" },
+     },
+     mouseCursor = {
+       moveToNextScreen = { { "ctrl", "shift"}, "right" },
+       moveToPreviousScreen = { { "ctrl", "shift" }, "left" },
+     },
+     windowLayout = {
+       layoutTiledBSP = { { "alt", "cmd" }, "Z" },
+       layoutFullScreen = { { "alt", "cmd" }, "F" },
+       layoutCascading = { { "alt", "cmd" }, "X" },
+       layoutMainAndStack = { { "alt", "cmd" }, "S" },
+       layoutThrees = { { "alt", "cmd" }, "D" },
+       layoutHalves = { { "alt", "cmd" }, "A" },
+     },
+     windowMovement = {
+       moveWindowLeft = { {"alt", "cmd"}, "left" },
+       moveWindowRight = { {"alt", "cmd"}, "right" },
+       moveWindowTop = { {"alt", "cmd"}, "up" },
+       moveWindowBottom = { {"alt", "cmd"}, "down" },
+       moveWindowCenter = { {"alt", "cmd"}, "C" },
+       moveWindowToNextScreen = { { "cmd", "alt" }, "]" },
+       moveWindowToPreviousScreen = { { "cmd", "alt" }, "["},
+       moveWindowToNextSpace = { {"shift", "alt", "cmd"}, "]" },
+       moveWindowToPreviousSpace = { {"shift", "alt", "cmd"}, "[" },
+     },
+     wpHelp = {
+       keyList = { { "alt", "cmd" }, "H" }
+     },
+   })
 
-```sh
-git clone https://github.com/ticklemynausea/WindowPilot.spoon.git
-mv WindowPilot.spoon ~/.hammerspoon/Spoons/
-```
+   wp:bindShortcuts({
+     { name = "Alacritty", keys = {  { "cmd" }, "1" } },
+     { name = "Google Chrome", keys = {  { "cmd" }, "2" } },
+     { name = "Slack", keys = {  { "cmd" }, "3" } },
+     { name = "Obsidian", keys = {  { "cmd" }, "4" } },
+     { name = "Zoom", keys = {  { "cmd" }, "5" } },
+     { name = "Safari", keys = {  { "cmd" }, "7" } },
+     { name = "Podcasts", keys = {  { "cmd" }, "8" } },
+     { name = "Spotify", keys = {  { "cmd" }, "9" } },
+     { name = "Gmail", keys = {  { "shift", "cmd" }, "1" } },
+     { name = "Google Calendar", keys = {  { "shift", "cmd" }, "2" } },
+   })
+   ```
+4. Reload Hammerspoon:
+   ```lua
+   hs.reload()
+   ```
 
-### **3. Load WindowPilot in Hammerspoon**
-Add the following to your `~/.hammerspoon/init.lua`:
+## Features
 
-```lua
-local wp = hs.loadSpoon("WindowPilot")
+- Keyboard window switching
+- Tiling layouts (BSP, fullscreen, cascading, main & stack)
+- Move windows to screen edges
+- Move windows between screens/spaces
+- Keyboard-controlled cursor movement
 
-wp:initialize({
-  windowMargin = 6
-})
+## Keybindings
 
-wp:bindKeys({
-  switchWindow = {
-    forward = { { "alt" }, "tab" },
-    backward = { { "alt", "shift" }, "tab" },
-  },
-  mouseCursor = {
-    moveToNextScreen = { { "ctrl", "shift"}, "left" },
-    moveToPreviousScreen = { { "ctrl", "shift" }, "right" },
-  },
-  windowLayout = {
-    layoutTiledBSP = { { "alt", "cmd" }, "T" },
-    layoutFullScreen = { { "alt", "cmd" }, "F" },
-    layoutCascading = { { "alt", "cmd" }, "C" },
-    layoutMainAndStack = { { "alt", "cmd" }, "S" },
-  },
-  windowMovement = {
-    moveWindowLeft = { { "alt", "cmd" }, "left" },
-    moveWindowRight = { { "alt", "cmd" }, "right" },
-    moveWindowTop = { { "alt", "cmd" }, "up" },
-    moveWindowBottom = { { "alt", "cmd" }, "down" },
-    moveWindowToNextScreen = { { "cmd", "alt" }, "]" },
-    moveWindowToPreviousScreen = { { "cmd", "alt" }, "[" },
-    moveWindowToNextSpace = { { "shift", "alt", "cmd" }, "]" },
-    moveWindowToPreviousSpace = { { "shift", "alt", "cmd" }, "[" },
-  }
-})
-```
+These are intuitively fully costumizable
 
-### **4. Reload Hammerspoon**
-Run this command in the Hammerspoon console (`Cmd + Shift + R` to open it):
+| Action                        | Shortcut                |
+|-------------------------------|-------------------------|
+| Switch to next window         | Alt + Tab              |
+| Switch to previous window     | Alt + Shift + Tab      |
+| Move window to next screen    | Cmd + Alt + ]          |
+| Move window to previous screen| Cmd + Alt + [          |
+| Move window to next space     | Shift + Alt + Cmd + ]  |
+| Move window to previous space | Shift + Alt + Cmd + [  |
+| Layout: BSP Tiling            | Alt + Cmd + Z          |
+| Layout: Fullscreen            | Alt + Cmd + F          |
+| Layout: Cascading             | Alt + Cmd + X          |
+| Layout: Main & Stack          | Alt + Cmd + S          |
+| Layout: Threes                | Alt + Cmd + D          |
+| Layout: Halves                | Alt + Cmd + A          |
+| Move window left              | Alt + Cmd + Left       |
+| Move window right             | Alt + Cmd + Right      |
+| Move window up                | Alt + Cmd + Up         |
+| Move window down              | Alt + Cmd + Down       |
+| Move window center            | Alt + Cmd + C          |
+| Show key list/help            | Alt + Cmd + H          |
+| Alacritty                     | Cmd + 1                |
+| Google Chrome                 | Cmd + 2                |
+| Slack                         | Cmd + 3                |
+| Obsidian                      | Cmd + 4                |
+| Zoom                          | Cmd + 5                |
+| Safari                        | Cmd + 7                |
+| Podcasts                      | Cmd + 8                |
+| Spotify                       | Cmd + 9                |
+| Gmail                         | Shift + Cmd + 1        |
+| Google Calendar               | Shift + Cmd + 2        |
 
-```lua
-hs.reload()
-```
+Change keybindings in `bindKeys` and `bindShortcuts` as needed.
 
----
+## License
 
-## **Features** ✨
-- **Fast window switching** (`Alt + Tab`, `Alt + Shift + Tab`)
-- **Tiling window layouts** (BSP, full-screen, cascading, main & stack)
-- **Throw windows to screen margins** (`Alt + Cmd + Arrow keys`)
-- **Move windows between screens/spaces**
-- **Keyboard-controlled cursor movement**
-
----
-
-## **Keybindings** ⌨️
-
-| Action                        | Shortcut |
-|--------------------------------|----------|
-| Switch to next window         | `Alt + Tab` |
-| Switch to previous window     | `Alt + Shift + Tab` |
-| Move window to next screen    | `Cmd + Alt + ]` |
-| Move window to previous screen | `Cmd + Alt + [` |
-| Move window to next space     | `Shift + Alt + Cmd + ]` |
-| Move window to previous space | `Shift + Alt + Cmd + [` |
-| Layout: BSP Tiling            | `Alt + Cmd + T` |
-| Layout: Fullscreen            | `Alt + Cmd + F` |
-| Layout: Cascading             | `Alt + Cmd + C` |
-| Layout: Main & Stack          | `Alt + Cmd + S` |
-
-> 📝 **Tip:** You can change the keybindings in `bindKeys` to suit your preferences.
-
----
-
-## **Contributing** 🛠️
-Contributions are welcome! Feel free to submit issues or pull requests on [GitHub](https://github.com/ticklemynausea/WindowPilot.spoon).
-
----
-
-## **License** 📜
-This project is licensed under the **MIT License**. See the [LICENSE](./LICENSE) file for details.
+MIT License. See [LICENSE](./LICENSE).
