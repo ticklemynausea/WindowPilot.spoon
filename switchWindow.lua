@@ -19,50 +19,57 @@ local function switchWindow(wp)
     end
   end
 
-  local function switchWindowForward()
-    updateVisibleWindows()
-    if #visibleWindows == 0 then
-      return
-    end
-
-    currentWindowIndex = currentWindowIndex + 1
-    if currentWindowIndex > #visibleWindows then
-      currentWindowIndex = 1
-    end
-
-    local nextWindow = visibleWindows[currentWindowIndex]
-    nextWindow:focus()
-  end
-
-  local function switchWindowBackward()
-    updateVisibleWindows()
-    if #visibleWindows == 0 then
-      return
-    end
-
-    currentWindowIndex = currentWindowIndex - 1
-    if currentWindowIndex < 1 then
-      currentWindowIndex = #visibleWindows
-    end
-
-    local prevWindow = visibleWindows[currentWindowIndex]
-    prevWindow:focus()
-  end
-
   local function switchToApp(name)
     print("Switching to: " .. name)
 
     local app = hs.application.get(name)
-    if app then
-      local win = app:mainWindow()
-      if win and win:isStandard() and not win:isMinimized() then
-        print("Fallback: focusing main window of app " .. name)
-        win:focus()
+    if not app then
+      hs.alert("Window or app not found: " .. name)
+      return
+    end
+
+    local focused = hs.window.focusedWindow()
+    local focusedApp = focused and focused:application()
+    if not focusedApp or focusedApp:name() ~= name then
+      local mainWin = app:mainWindow()
+      if mainWin and mainWin:isStandard() and not mainWin:isMinimized() then
+        mainWin:focus()
         return
+      end
+      -- Fallback: focus any standard, non-minimized window
+      for _, win in ipairs(app:allWindows()) do
+        if win:isStandard() and not win:isMinimized() then
+          win:focus()
+          return
+        end
+      end
+      hs.alert("No windows found for app: " .. name)
+      return
+    end
+
+    local windows = {}
+    for _, win in ipairs(app:allWindows()) do
+      if win:isStandard() and not win:isMinimized() then
+        table.insert(windows, win)
       end
     end
 
-    hs.alert("Window or app not found: " .. name)
+    if #windows == 0 then
+      hs.alert("No windows found for app: " .. name)
+      return
+    end
+
+    table.sort(windows, function(a, b) return a:id() < b:id() end)
+
+    local idx = 1
+    for i, win in ipairs(windows) do
+      if focused and win:id() == focused:id() then
+        idx = i % #windows + 1
+        break
+      end
+    end
+
+    windows[idx]:focus()
   end
 
   return {
