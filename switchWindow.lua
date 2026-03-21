@@ -19,6 +19,36 @@ local function switchWindow(wp)
     end
   end
 
+  local function switchWindowForward()
+    updateVisibleWindows()
+    if #visibleWindows == 0 then
+      return
+    end
+
+    currentWindowIndex = currentWindowIndex + 1
+    if currentWindowIndex > #visibleWindows then
+      currentWindowIndex = 1
+    end
+
+    local nextWindow = visibleWindows[currentWindowIndex]
+    nextWindow:focus()
+  end
+
+  local function switchWindowBackward()
+    updateVisibleWindows()
+    if #visibleWindows == 0 then
+      return
+    end
+
+    currentWindowIndex = currentWindowIndex - 1
+    if currentWindowIndex < 1 then
+      currentWindowIndex = #visibleWindows
+    end
+
+    local prevWindow = visibleWindows[currentWindowIndex]
+    prevWindow:focus()
+  end
+
   local function switchToApp(name)
     print("Switching to: " .. name)
 
