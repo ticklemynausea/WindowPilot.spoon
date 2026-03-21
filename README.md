@@ -2,6 +2,10 @@
 
 Window management utilities for macOS using Hammerspoon.
 
+## Disclaimer
+
+This is a personal project created for personal use and to experiment with LLM-assisted code generation. While functional, it may not be suitable for all use cases or production environments. Use at your own discretion.
+
 ## Installation
 
 1. Install Hammerspoon: [https://www.hammerspoon.org/](https://www.hammerspoon.org/)
