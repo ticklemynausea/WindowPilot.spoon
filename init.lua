@@ -15,13 +15,62 @@ function wp:initialize(configuration)
 
   wp.configuration = {
     windowMargin = 6,
+    logLevel = "INFO", -- DEBUG, INFO, WARN, ERROR
+    windowSizes = {
+      move = { 0.5, 0.3335, 0.669 },
+      center = { 0.6, 0.75, 0.9 }
+    },
+    cascadeOffset = 5,
+    notificationDuration = 2
   }
+
+  wp.log = {
+    DEBUG = 1,
+    INFO = 2,
+    WARN = 3,
+    ERROR = 4
+  }
+
+  function wp:logMessage(level, message)
+    local levels = { "DEBUG", "INFO", "WARN", "ERROR" }
+    local configLevel = self.log[self.configuration.logLevel] or self.log.INFO
+    local messageLevel = self.log[level] or self.log.INFO
+
+    if messageLevel >= configLevel then
+      print(string.format("[WindowPilot %s] %s", level, message))
+    end
+  end
+
+  function wp:showNotification(message, duration)
+    if not message or type(message) ~= "string" then
+      wp:logMessage("ERROR", "showNotification called with invalid message")
+      return
+    end
+    duration = duration or wp.configuration.notificationDuration
+    hs.alert.show(message, duration)
+  end
+
+  function wp:validateConfiguration()
+    if not self.configuration.windowMargin or type(self.configuration.windowMargin) ~= "number" then
+      self.configuration.windowMargin = 6
+      wp:logMessage("WARN", "Invalid windowMargin, using default: 6")
+    end
+
+    if not self.configuration.windowSizes or not self.configuration.windowSizes.move then
+      self.configuration.windowSizes = {
+        move = { 0.5, 0.3335, 0.669 },
+        center = { 0.6, 0.75, 0.9 }
+      }
+      wp:logMessage("WARN", "Invalid windowSizes, using defaults")
+    end
+  end
 
   for key, value in pairs(configuration) do
     wp.configuration[key] = value
   end
 
-  print("[WindowPilot] Configured")
+  wp:validateConfiguration()
+  wp:logMessage("INFO", "Configured")
 
   wp.commands = {
     switchWindow = require("switchWindow")(wp),
@@ -33,7 +82,7 @@ function wp:initialize(configuration)
 
   require("menuItem")(wp)
 
-  print("[WindowPilot] Initialized")
+  wp:logMessage("INFO", "Initialized")
 end
 
 function wp:bindKeys(mapping, prefix)
@@ -56,9 +105,9 @@ function wp:bindKeys(mapping, prefix)
             command(wp)
           end),
         }
-        print("[WindowPilot] Bound key for " .. actionPath)
+        wp:logMessage("DEBUG", "Bound key for " .. actionPath)
       else
-        print("[WindowPilot] Error: Command not found for " .. actionPath)
+        wp:logMessage("ERROR", "Command not found for " .. actionPath)
       end
     else
       self:bindKeys(value, actionPath)
@@ -83,7 +132,7 @@ function wp:bindShortcuts(bindings)
       end),
     }
 
-    print("[WindowPilot] Bound window shortcut for " .. name)
+    wp:logMessage("DEBUG", "Bound window shortcut for " .. name)
   end
 end
 

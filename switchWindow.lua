@@ -50,11 +50,16 @@ local function switchWindow(wp)
   end
 
   local function switchToApp(name)
-    print("Switching to: " .. name)
+    if not name or type(name) ~= "string" or name == "" then
+      wp:showNotification("Invalid app name provided")
+      return
+    end
+
+    wp:logMessage("DEBUG", "Switching to app: " .. name)
 
     local app = hs.application.get(name)
     if not app then
-      hs.alert("Window or app not found: " .. name)
+      wp:showNotification("App not found: " .. name)
       return
     end
 
@@ -73,7 +78,7 @@ local function switchWindow(wp)
           return
         end
       end
-      hs.alert("No windows found for app: " .. name)
+      wp:showNotification("No windows available for " .. name)
       return
     end
 
@@ -85,7 +90,7 @@ local function switchWindow(wp)
     end
 
     if #windows == 0 then
-      hs.alert("No windows found for app: " .. name)
+      wp:showNotification("No windows available for " .. name)
       return
     end
 

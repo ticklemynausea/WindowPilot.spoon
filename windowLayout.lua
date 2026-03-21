@@ -78,7 +78,7 @@ local function windowLayout(wp)
     local numWindows = #windows
 
     if numWindows == 0 then
-      hs.alert.show("No windows to tile in the current space.")
+      wp:showNotification("No windows to tile in the current space.")
       return
     end
 
@@ -101,7 +101,7 @@ local function windowLayout(wp)
   local function layoutFullScreen()
     local windows = getVisibleWindowsInCurrentSpace()
     if #windows == 0 then
-      hs.alert.show("No windows to tile in the current space.")
+      wp:showNotification("No windows to tile in the current space.")
       return
     end
 
@@ -123,14 +123,15 @@ local function windowLayout(wp)
     local windows = getVisibleWindowsInCurrentSpace()
 
     if #windows == 0 then
-      hs.alert.show("No windows to cascade in the current space.")
+      wp:showNotification("No windows to cascade in the current space.")
       return
     end
 
     local cascadeWidth = screenFrame.w * 0.9
     local cascadeHeight = screenFrame.h * 0.9
-    local offsetX = margin * 5
-    local offsetY = margin * 5
+    local cascadeOffset = wp.configuration.cascadeOffset
+    local offsetX = margin * cascadeOffset
+    local offsetY = margin * cascadeOffset
     local maxOffsetCount = math.min(#windows, math.floor((screenFrame.w - cascadeWidth) / offsetX))
     local totalOffsetX = math.min((#windows - 1) * offsetX, maxOffsetCount * offsetX)
     local totalOffsetY = math.min((#windows - 1) * offsetY, maxOffsetCount * offsetY)
@@ -158,7 +159,7 @@ local function windowLayout(wp)
     local windows = getVisibleWindowsInCurrentSpace()
 
     if #windows == 0 then
-      hs.alert.show("No windows to arrange.")
+      wp:showNotification("No windows to arrange.")
       return
     end
 
@@ -212,7 +213,7 @@ local function windowLayout(wp)
     local windows = getVisibleWindowsInCurrentSpace()
 
     if #windows == 0 then
-      hs.alert.show("No windows to arrange.")
+      wp:showNotification("No windows to arrange.")
       return
     end
 
@@ -271,7 +272,7 @@ local function windowLayout(wp)
     local windows = getVisibleWindowsInCurrentSpace()
 
     if #windows == 0 then
-      hs.alert.show("No windows to arrange.")
+      wp:showNotification("No windows to arrange.")
       return
     end
 

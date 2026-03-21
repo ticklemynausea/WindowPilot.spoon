@@ -1,7 +1,7 @@
 local function windowMovement(wp)
   local margin = wp.configuration.windowMargin
-  local moveWindowSizes = { 0.5, 0.3335, 0.669 }
-  local centerWindowSizes = { 0.6, 0.75, 0.9 }
+  local moveWindowSizes = wp.configuration.windowSizes.move
+  local centerWindowSizes = wp.configuration.windowSizes.center
 
   local function nextWindowPosition(current, presets)
     local closest = presets[1]
@@ -22,7 +22,7 @@ local function windowMovement(wp)
   local function moveWindow(direction)
     local win = hs.window.focusedWindow()
     if not win then
-      hs.alert.show("No focused window!")
+      wp:showNotification("No focused window!")
       return
     end
 
@@ -69,7 +69,7 @@ local function windowMovement(wp)
         h = (h * nextHeight) - (2 * margin),
       }, 0)
     else
-      hs.alert.show("Invalid direction! Use 'left', 'right', 'top', or 'bottom'")
+      wp:showNotification("Invalid direction! Use 'left', 'right', 'top', or 'bottom'")
     end
   end
 
@@ -90,14 +90,14 @@ local function windowMovement(wp)
   local function moveWindowToSpace(direction)
     local win = hs.window.focusedWindow()
     if not win then
-      hs.alert.show("No focused window to move.")
+      wp:showNotification("No focused window to move.")
       return
     end
 
     local screen = win:screen()
     local currentSpace = hs.spaces.windowSpaces(win:id())[1]
     if not currentSpace then
-      hs.alert.show("Unable to determine the current space.")
+      wp:showNotification("Unable to determine the current space.")
       return
     end
 
@@ -105,7 +105,7 @@ local function windowMovement(wp)
     local spaceIndex = hs.fnutils.indexOf(spaces, currentSpace)
 
     if not spaceIndex then
-      hs.alert.show("Space not found.")
+      wp:showNotification("Space not found.")
       return
     end
 
