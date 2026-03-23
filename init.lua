@@ -50,6 +50,37 @@ function wp:initialize(configuration)
     hs.alert.show(message, duration)
   end
 
+  function wp:formatModifiers(modifiers)
+    if not modifiers then return "" end
+    local symbolMap = {
+      alt = "⌥",
+      cmd = "⌘",
+      shift = "⇧",
+      ctrl = "⌃"
+    }
+
+    local symbols = {}
+    for _, mod in ipairs(modifiers) do
+      table.insert(symbols, symbolMap[mod] or mod)
+    end
+    return table.concat(symbols)
+  end
+
+  function wp:formatKeyShortcut(keys)
+    if not keys or #keys < 2 then return "" end
+    local modifiers, key = keys[1], keys[2]
+    local modSymbols = self:formatModifiers(modifiers)
+
+    -- Handle special key names
+    local keyMap = {
+      left = "←", right = "→", up = "↑", down = "↓",
+      tab = "⇥", space = "␣", ["return"] = "↩"
+    }
+    local keySymbol = keyMap[key] or string.upper(key)
+
+    return modSymbols .. keySymbol
+  end
+
   function wp:validateConfiguration()
     if not self.configuration.windowMargin or type(self.configuration.windowMargin) ~= "number" then
       self.configuration.windowMargin = 6
@@ -80,7 +111,7 @@ function wp:initialize(configuration)
     wpHelp = require("help")(wp),
   }
 
-  require("menuItem")(wp)
+  wp.menuHandler = require("menuItem")(wp)
 
   wp:logMessage("INFO", "Initialized")
 end
@@ -113,6 +144,11 @@ function wp:bindKeys(mapping, prefix)
       self:bindKeys(value, actionPath)
     end
   end
+
+  -- Update menu after binding keys
+  if wp.menuHandler and wp.menuHandler.updateMenu then
+    wp.menuHandler.updateMenu()
+  end
 end
 
 function wp:bindShortcuts(bindings)
@@ -133,6 +169,11 @@ function wp:bindShortcuts(bindings)
     }
 
     wp:logMessage("DEBUG", "Bound window shortcut for " .. name)
+  end
+
+  -- Update menu after binding app shortcuts
+  if wp.menuHandler and wp.menuHandler.updateMenu then
+    wp.menuHandler.updateMenu()
   end
 end
 
