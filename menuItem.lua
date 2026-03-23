@@ -181,11 +181,107 @@ local function menuItem(wp)
     return menuItems
   end
 
+  local function createCustomIcon()
+    -- Create a professional window manager icon
+    local size = 22
+    local canvas = hs.canvas.new({ x = 0, y = 0, w = size, h = size })
+
+    -- Modern window tiling icon design
+    -- Background (subtle)
+    canvas[1] = {
+      type = "rectangle",
+      frame = { x = 1, y = 1, w = size-2, h = size-2 },
+      fillColor = { white = 0, alpha = 0 },
+      strokeColor = { white = 0, alpha = 0 }
+    }
+
+    -- Main window (left side)
+    canvas[2] = {
+      type = "rectangle",
+      frame = { x = 2, y = 3, w = 8, h = 16 },
+      fillColor = { white = 0.1, alpha = 0.7 },
+      strokeColor = { white = 0.3 },
+      strokeWidth = 0.5,
+      roundedRectRadii = { xRadius = 1, yRadius = 1 }
+    }
+
+    -- Secondary windows (right side, stacked)
+    canvas[3] = {
+      type = "rectangle",
+      frame = { x = 12, y = 3, w = 8, h = 7 },
+      fillColor = { white = 0.1, alpha = 0.5 },
+      strokeColor = { white = 0.3 },
+      strokeWidth = 0.5,
+      roundedRectRadii = { xRadius = 1, yRadius = 1 }
+    }
+
+    canvas[4] = {
+      type = "rectangle",
+      frame = { x = 12, y = 12, w = 8, h = 7 },
+      fillColor = { white = 0.1, alpha = 0.5 },
+      strokeColor = { white = 0.3 },
+      strokeWidth = 0.5,
+      roundedRectRadii = { xRadius = 1, yRadius = 1 }
+    }
+
+    -- Title bars (small rectangles on top)
+    canvas[5] = {
+      type = "rectangle",
+      frame = { x = 2, y = 3, w = 8, h = 2 },
+      fillColor = { white = 0.4, alpha = 0.8 },
+      roundedRectRadii = { xRadius = 1, yRadius = 1 }
+    }
+
+    canvas[6] = {
+      type = "rectangle",
+      frame = { x = 12, y = 3, w = 8, h = 2 },
+      fillColor = { white = 0.4, alpha = 0.6 },
+      roundedRectRadii = { xRadius = 1, yRadius = 1 }
+    }
+
+    canvas[7] = {
+      type = "rectangle",
+      frame = { x = 12, y = 12, w = 8, h = 2 },
+      fillColor = { white = 0.4, alpha = 0.6 },
+      roundedRectRadii = { xRadius = 1, yRadius = 1 }
+    }
+
+    return canvas:imageFromCanvas()
+  end
+
+  local customIcon = nil -- Cache the icon
+
+  local function getOrCreateIcon()
+    -- Return cached icon if we already created it
+    if customIcon then
+      return customIcon
+    end
+
+    -- Create custom icon in memory (no file saving)
+    customIcon = createCustomIcon()
+    if customIcon then
+      wp:logMessage("INFO", "Created custom WindowPilot icon in memory")
+      return customIcon
+    end
+
+    wp:logMessage("WARN", "Failed to create custom icon")
+    return nil
+  end
+
   local function updateMenu()
     if menubar then
-      menubar:setTitle("")
-      local image = hs.image.imageFromName("NSStatusAvailable")
-      menubar:setIcon(image)
+      -- Use custom WindowPilot icon
+      local icon = getOrCreateIcon()
+      if icon then
+        menubar:setIcon(icon)
+        menubar:setTitle("")
+        wp:logMessage("DEBUG", "Using custom WindowPilot icon")
+      else
+        -- Fallback to text symbol
+        menubar:setTitle("⌘")
+        menubar:setIcon(nil)
+        wp:logMessage("WARN", "Could not create custom icon, using text fallback")
+      end
 
       local menuItems = buildMenuItems()
       menubar:setMenu(menuItems)
