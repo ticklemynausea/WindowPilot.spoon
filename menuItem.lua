@@ -1,8 +1,37 @@
 local function menuItem(wp)
-  local menubar = hs.menubar.new()
+  -- Public API (exposed to the module consumer)
+  local public = {}
 
-  -- Action name mapping for user-friendly menu titles
-  local actionNames = {
+  -- Private variables and functions (internal to the module)
+  local private = {}
+
+  -- Module state
+  private.menubar = hs.menubar.new()
+  private.customIcon = nil -- Cache the icon
+
+  -- Public functions
+  public.updateMenu = function()
+    if private.menubar then
+      -- Use custom WindowPilot icon
+      local icon = private.getOrCreateIcon()
+      if icon then
+        private.menubar:setIcon(icon)
+        private.menubar:setTitle("")
+        wp:logMessage("DEBUG", "Using custom WindowPilot icon")
+      else
+        -- Fallback to text symbol
+        private.menubar:setTitle("⌘")
+        private.menubar:setIcon(nil)
+        wp:logMessage("WARN", "Could not create custom icon, using text fallback")
+      end
+
+      local menuItems = private.buildMenuItems()
+      private.menubar:setMenu(menuItems)
+    end
+  end
+
+  -- Private data and configuration
+  private.actionNames = {
     -- Window Layout
     ["windowLayout.layoutTiledBSP"] = "Binary Space Partitioning",
     ["windowLayout.layoutMainAndStack"] = "Main and Stack",
@@ -35,7 +64,7 @@ local function menuItem(wp)
   }
 
   -- Category organization with specific patterns first
-  local categoryRules = {
+  private.categoryRules = {
     { name = "Layouts", pattern = "^windowLayout%." },
     { name = "Screen & Space", pattern = "^windowMovement%..*Screen$" },
     { name = "Screen & Space", pattern = "^windowMovement%..*Space$" },
@@ -46,7 +75,7 @@ local function menuItem(wp)
   }
 
   -- Define category display order
-  local categoryOrder = {
+  private.categoryOrder = {
     "Layouts",
     "Window Movement",
     "Screen & Space",
@@ -55,7 +84,8 @@ local function menuItem(wp)
     "Help"
   }
 
-  local function getActionCommand(actionPath)
+  -- Private helper functions
+  private.getActionCommand = function(actionPath)
     local parts = {}
     for part in actionPath:gmatch("[^.]+") do
       table.insert(parts, part)
@@ -68,9 +98,9 @@ local function menuItem(wp)
     return nil
   end
 
-  local function categorizeAction(actionPath)
+  private.categorizeAction = function(actionPath)
     -- Find category for action
-    for _, rule in ipairs(categoryRules) do
+    for _, rule in ipairs(private.categoryRules) do
       if actionPath:match(rule.pattern) then
         return rule.name
       end
@@ -78,7 +108,7 @@ local function menuItem(wp)
     return "Other"
   end
 
-  local function createMenuItem(actionName, shortcut, command)
+  private.createMenuItem = function(actionName, shortcut, command)
     local menuItem = {
       fn = function()
         command()
@@ -102,19 +132,45 @@ local function menuItem(wp)
     return menuItem
   end
 
-  local function buildMenuItems()
-    local menuItems = {}
+  private.parseShortcut = function(shortcut)
+    -- Count modifier symbols at the beginning
+    local modCount = 0
+    local key = shortcut
 
-    -- Count and log hotkeys
-    local hotkeyCount = 0
-    if wp.hotkeys then
-      for _ in pairs(wp.hotkeys) do
-        hotkeyCount = hotkeyCount + 1
-      end
+    -- Count each modifier symbol
+    for _, mod in ipairs({"⌘", "⇧", "⌥", "⌃"}) do
+      local _, count = shortcut:gsub(mod, "")
+      modCount = modCount + count
+      key = key:gsub(mod, "")
     end
-    wp:logMessage("DEBUG", "Building menu items from " .. hotkeyCount .. " hotkeys")
 
-    -- First, collect all actions by category
+    -- Extract numeric key if present
+    local numKey = tonumber(key) or 999  -- Non-numeric keys go to the end
+
+    return modCount, numKey, key
+  end
+
+  private.sortAppShortcuts = function(shortcuts)
+    table.sort(shortcuts, function(a, b)
+      local aModCount, aNumKey, aKey = private.parseShortcut(a.shortcut)
+      local bModCount, bNumKey, bKey = private.parseShortcut(b.shortcut)
+
+      -- First sort by modifier count (fewer modifiers first)
+      if aModCount ~= bModCount then
+        return aModCount < bModCount
+      end
+
+      -- Then by numeric key value
+      if aNumKey ~= bNumKey then
+        return aNumKey < bNumKey
+      end
+
+      -- Finally by key string (for non-numeric keys)
+      return aKey < bKey
+    end)
+  end
+
+  private.collectHotkeyActions = function()
     local categorizedActions = {}
     local appShortcuts = {}
 
@@ -132,14 +188,14 @@ local function menuItem(wp)
         end
       else
         -- Handle regular actions
-        local actionName = actionNames[actionPath]
+        local actionName = private.actionNames[actionPath]
         local shortcut = wp:formatKeyShortcut(hotkeyData.keys)
-        local command = getActionCommand(actionPath)
+        local command = private.getActionCommand(actionPath)
 
         wp:logMessage("DEBUG", "Processing action: " .. actionPath .. " -> " .. (actionName or "UNKNOWN"))
 
         if actionName and command then
-          local category = categorizeAction(actionPath)
+          local category = private.categorizeAction(actionPath)
           if not categorizedActions[category] then
             categorizedActions[category] = {}
           end
@@ -152,8 +208,11 @@ local function menuItem(wp)
       end
     end
 
-    -- Build menu in category order
-    for _, categoryName in ipairs(categoryOrder) do
+    return categorizedActions, appShortcuts
+  end
+
+  private.addCategorizedActions = function(menuItems, categorizedActions)
+    for _, categoryName in ipairs(private.categoryOrder) do
       local actions = categorizedActions[categoryName]
       if actions and #actions > 0 then
         -- Add separator if not first category
@@ -163,25 +222,50 @@ local function menuItem(wp)
 
         -- Add all actions in this category
         for _, action in ipairs(actions) do
-          table.insert(menuItems, createMenuItem(action.name, action.shortcut, action.command))
+          table.insert(menuItems, private.createMenuItem(action.name, action.shortcut, action.command))
         end
       end
     end
+  end
 
-    -- Add app shortcuts at the end
+  private.addAppShortcuts = function(menuItems, appShortcuts)
     if #appShortcuts > 0 then
+      private.sortAppShortcuts(appShortcuts)
+
       if #menuItems > 0 then
         table.insert(menuItems, { title = "-" })
       end
       for _, app in ipairs(appShortcuts) do
-        table.insert(menuItems, createMenuItem(app.name, app.shortcut, app.fn))
+        table.insert(menuItems, private.createMenuItem(app.name, app.shortcut, app.fn))
       end
     end
+  end
+
+  private.buildMenuItems = function()
+    local menuItems = {}
+
+    -- Count and log hotkeys
+    local hotkeyCount = 0
+    if wp.hotkeys then
+      for _ in pairs(wp.hotkeys) do
+        hotkeyCount = hotkeyCount + 1
+      end
+    end
+    wp:logMessage("DEBUG", "Building menu items from " .. hotkeyCount .. " hotkeys")
+
+    -- Collect all actions and app shortcuts
+    local categorizedActions, appShortcuts = private.collectHotkeyActions()
+
+    -- Build menu in category order
+    private.addCategorizedActions(menuItems, categorizedActions)
+
+    -- Add sorted app shortcuts at the end
+    private.addAppShortcuts(menuItems, appShortcuts)
 
     return menuItems
   end
 
-  local function createCustomIcon()
+  private.createCustomIcon = function()
     -- Create a professional window manager icon
     local size = 22
     local canvas = hs.canvas.new({ x = 0, y = 0, w = size, h = size })
@@ -249,47 +333,28 @@ local function menuItem(wp)
     return canvas:imageFromCanvas()
   end
 
-  local customIcon = nil -- Cache the icon
-
-  local function getOrCreateIcon()
+  private.getOrCreateIcon = function()
     -- Return cached icon if we already created it
-    if customIcon then
-      return customIcon
+    if private.customIcon then
+      return private.customIcon
     end
 
     -- Create custom icon in memory (no file saving)
-    customIcon = createCustomIcon()
-    if customIcon then
+    private.customIcon = private.createCustomIcon()
+    if private.customIcon then
       wp:logMessage("INFO", "Created custom WindowPilot icon in memory")
-      return customIcon
+      return private.customIcon
     end
 
     wp:logMessage("WARN", "Failed to create custom icon")
     return nil
   end
 
-  local function updateMenu()
-    if menubar then
-      -- Use custom WindowPilot icon
-      local icon = getOrCreateIcon()
-      if icon then
-        menubar:setIcon(icon)
-        menubar:setTitle("")
-        wp:logMessage("DEBUG", "Using custom WindowPilot icon")
-      else
-        -- Fallback to text symbol
-        menubar:setTitle("⌘")
-        menubar:setIcon(nil)
-        wp:logMessage("WARN", "Could not create custom icon, using text fallback")
-      end
+  -- Initialize the menu on module load
+  public.updateMenu()
 
-      local menuItems = buildMenuItems()
-      menubar:setMenu(menuItems)
-    end
-  end
-
-  updateMenu()
-  return { updateMenu = updateMenu }
+  -- Return public API
+  return public
 end
 
 return menuItem
