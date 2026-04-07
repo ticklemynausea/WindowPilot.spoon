@@ -112,6 +112,7 @@ function wp:initialize(configuration)
   }
 
   wp.menuHandler = require("menuItem")(wp)
+  wp.windowWatcher = require("windowWatcher")(wp)
 
   wp:logMessage("INFO", "Initialized")
 end
@@ -175,6 +176,20 @@ function wp:bindShortcuts(bindings)
   if wp.menuHandler and wp.menuHandler.updateMenu then
     wp.menuHandler.updateMenu()
   end
+end
+
+function wp:startWindowWatcher()
+  if self.windowWatcher then
+    self.windowWatcher.start()
+  end
+  wp:logMessage("INFO", "Window watcher started")
+end
+
+function wp:stopWindowWatcher()
+  if self.windowWatcher then
+    self.windowWatcher.stop()
+  end
+  wp:logMessage("INFO", "Window watcher stopped")
 end
 
 return wp
